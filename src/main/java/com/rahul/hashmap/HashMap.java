@@ -5,32 +5,30 @@ import java.util.List;
 
 public class HashMap {
     //default size
-
     int size = 16;
     List<Node> bucket;
 
+    //Constructor
     public HashMap() {
-
         this.bucket = new ArrayList<>(size);
         for(int i=0;i<size;i++){
             bucket.add(new Node());
         }
     }
 
+    //put logic implementation
     public void put(String key, Integer val) {
         Node toInsert = new Node(key, val);
         Integer hash = getHash(key);
         int loc = handleBucket(hash);
 
-            //check for collision first
-            //curr value at the location
+            //get the bucket for insertion , using hash function
             Node first = bucket.get(loc);
+
             //keeping temp , so I don't lose the first
             Node temp = first;
 
-            //also needs to check for same key
-            //logic to overwrite
-
+            // Same key , logic to overwrite
             if (containsKey(key)) {
                 if(temp.key==null) temp=temp.next;
                 while (!temp.key.equals(key)) {
@@ -39,10 +37,11 @@ public class HashMap {
                 }
                 temp.val = val;
             }
-            //looking for insertion location
+
+            //looking for insertion location in case of collision
+
             else {
                 while (temp.next != null) {
-                    // containsKey(key);
                     temp = temp.next;
                 }
                 // here value will be inserted
@@ -84,33 +83,38 @@ public class HashMap {
         return key.hashCode();
     }
 
+    //method to check conatins key
     private boolean containsKey(String key) {
         int loc = handleBucket(getHash(key));
         Node curr = (Node) bucket.get(loc);
         while (curr!= null) {
-            // String temp= curr.key;
             if (key.equals(curr.key)) return true;
             curr = curr.next;
         }
         return false;
     }
 
+//resizing logic
 
     public void resize(int currsize) {
-
+//edge case handling
         if (currsize < this.size) return;
         this.size = size;
         List<Node> oldBucket = bucket;
-
+//new arraylist of new size  being assigned to bucket
+//and bucket moved to new bucket
         bucket = new ArrayList<Node>(size);
+        //initializing with empty nodes
         for(int i=0;i<size;i++){
             bucket.add(i,new Node());
         }
-
+//
         for (Node node : oldBucket) {
             if (node.next != null) {
                 Node temp = node;
                 while (temp.next != null) {
+                    //hashing and bucketing logic will handle the position
+                    //as instead of dividing with constants , it is being divided by current size
                     put(temp.key, temp.val);
                     temp = temp.next;
                 }
